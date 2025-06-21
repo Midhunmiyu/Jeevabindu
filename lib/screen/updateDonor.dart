@@ -1,27 +1,38 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-class AddDonorScreen extends StatefulWidget {
-  const AddDonorScreen({super.key});
+class UpdateDonorScreen extends StatefulWidget {
+  const UpdateDonorScreen({super.key});
 
   @override
-  State<AddDonorScreen> createState() => _AddDonorScreenState();
+  State<UpdateDonorScreen> createState() => _UpdateDonorScreenState();
 }
 
-class _AddDonorScreenState extends State<AddDonorScreen> {
+class _UpdateDonorScreenState extends State<UpdateDonorScreen> {
   final bloodGroups = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
   String? selectedGroup;
 
   final CollectionReference donor = FirebaseFirestore.instance.collection("donor");
   TextEditingController donorName = TextEditingController();
   TextEditingController donorPhone = TextEditingController();
-  void addDonor() {
-    final data = {"name": donorName.text, "phone": donorPhone.text, "group": selectedGroup};
-    donor.add(data);
+  void updateDonor(docId) {
+    final data = {
+      "name": donorName.text,
+      "phone": donorPhone.text,
+      "group": selectedGroup,
+    };
+    donor.doc(docId).update(data).then((onValue) => Navigator.pop(context));
   }
 
   @override
   Widget build(BuildContext context) {
+    final args = ModalRoute.of(context)!.settings.arguments as Map;
+
+    donorName.text = args["name"];
+    donorPhone.text = args["phone"];
+    selectedGroup = args["group"];
+    final docId = args["id"];
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -39,7 +50,7 @@ class _AddDonorScreenState extends State<AddDonorScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const Text(
-                "Add Donor Details",
+                "Update Donor Details",
                 style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
               ),
@@ -68,6 +79,7 @@ class _AddDonorScreenState extends State<AddDonorScreen> {
               ),
               const SizedBox(height: 20),
               DropdownButtonFormField<String>(
+                value: selectedGroup,
                 decoration: const InputDecoration(
                     labelText: "Select Blood Group",
                     labelStyle: TextStyle(color: Colors.black),
@@ -97,10 +109,9 @@ class _AddDonorScreenState extends State<AddDonorScreen> {
                   ),
                 ),
                 onPressed: () {
-                  addDonor();
-                  Navigator.pop(context);
+                  updateDonor(docId);
                 },
-                child: const Text("Submit"),
+                child: const Text("Update"),
               ),
             ],
           ),

@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
 import './screen/homeScreen.dart';
 import './screen/addDonor.dart';
+import './screen/updateDonor.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-void main() {
+Future<void> main() async {
+  //--------firebase setup-----------
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(const MyApp());
 }
 
@@ -17,6 +23,7 @@ class MyApp extends StatelessWidget {
       routes: {
         "/": (context) => const Homescreen(),
         "/addDonor": (context) => const AddDonorScreen(),
+        "/updateDonor": (context) => const UpdateDonorScreen(),
       },
       initialRoute: "/",
     );
